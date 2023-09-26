@@ -1,0 +1,10 @@
+---
+title: "Homework 2"
+author: "Yuki Joyama"
+date: "2023-09-26"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
