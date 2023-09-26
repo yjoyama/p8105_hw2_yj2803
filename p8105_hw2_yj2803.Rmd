@@ -15,7 +15,7 @@ library(tidyverse)
 ```
 
 ```{r}
-pols_month =
+pols_month_df =
   read_csv("./fivethirtyeight_datasets/pols-month.csv") |> # import pols_month.csv file
   separate(col=mon, into=c("year", "month", "day")) |> # separate mon variable into year, month and day
   mutate(
@@ -44,4 +44,40 @@ pols_month =
   ) |> 
   select(-c("prez_dem", "prez_gop", "day")) # remove prez_dem, prez_gop, and day
 ```
+
+```{r}
+snp_df =
+  read_csv("./fivethirtyeight_datasets/snp.csv") |> # import snp.csv file
+  separate(col = date, into = c("month", "day", "year")) |> # separate date variable into year, month and day
+  mutate(
+    year = as.integer(year), # change the class of year, month, day to integer
+    month = as.integer(month),
+    day = as.integer(day),
+    month = case_match(
+    month,
+    01 ~ "january",
+    02 ~ "february",
+    03 ~ "march",
+    04 ~ "april",
+    05 ~ "may",
+    06 ~ "june",
+    07 ~ "july",
+    08 ~ "august",
+    09 ~ "september",
+    10 ~ "october",
+    11 ~ "november",
+    12 ~ "december"
+    ), # replace month number with month name
+    year = case_when(
+      year < 23 ~ 2000 + year,
+      year >=23 ~ 1900 + year
+    ) # if year < 23, add 2000; if year >= 23, add 1900
+  ) |> 
+  arrange(year, month) |> # arrange order according to year and month
+  relocate(year, month) # change position of columns year and month
+```
+
+
+
+
 
