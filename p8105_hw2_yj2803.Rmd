@@ -82,7 +82,8 @@ snp_df =
     12 ~ "dec"
     ) # replace month number with month name
   ) |> 
-  relocate(year, month) # change position of columns year and month
+  relocate(year, month) |> # change position of columns year and month
+  select(-"day") # remove day
 
 snp_df
 ```
@@ -105,7 +106,13 @@ unemployment_df
 Now, let's merge snp into pols, and merge unemployment data into the result.
 
 ```{r}
+fivethrityeight_df =
+  left_join(pols_month_df, snp_df, by = c("year", "month")) |> # merge snp into pols,
+  left_join(unemployment_df, by = c("year", "month")) |> # merge unemployment data into the result
+  relocate("year", "month", "president", "close", "unemployment_rate") # bring key variables to the front
 
+fivethrityeight_df
 ```
+
 
 
