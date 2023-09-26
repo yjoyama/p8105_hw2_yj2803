@@ -129,21 +129,62 @@ professor_df =
   readxl::read_excel("Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M96") |> # data of Professor Trash Wheel
   janitor::clean_names()
 
-captain_df =
-  readxl::read_excel("Trash Wheel Collection Data.xlsx", sheet = "Captain Trash Wheel", range = "A2:K27") |> # data of Captain Trash Wheel
-  janitor::clean_names()
-
 gwynnda_df =
   readxl::read_excel("Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", range = "A2:K108") |> # data of Gwynnda Trash Wheel
   janitor::clean_names()
 ```
 
+*Homes Powered - Each ton of trash equates to on average 500 kilowatts of electricity. An average household will use 30 kilowatts per day.
 
+Following the above note, I will calculate homes_powered variable for every dumpster data and update it in each dataset. I will also add an additional variable which specifies the name of Trash Wheel.
 
+```{r}
+mister_df = mister_df |> 
+  mutate(
+    homes_powered = (weight_tons * 500) / 30,
+    name = "mister"
+  ) |> 
+  relocate("name") # bring the name to the front
 
+professor_df = professor_df |> 
+  mutate(
+    homes_powered = (weight_tons * 500) / 30,
+    name = "professor"
+  ) |> 
+  relocate("name") # bring the name to the front
 
+gwynnda_df = gwynnda_df |> 
+  mutate(
+    homes_powered = (weight_tons * 500) / 30,
+    name = "gwynnda"
+  ) |> 
+  relocate("name") # bring the name to the front
+```
 
+Now, let's combine the three datasets.
 
+```{r}
+# change year variable in mister_df from chr to int
+mister_df = mister_df |> 
+  mutate(year = as.integer(year))
+
+# combine datasets
+trash_wheel_df =
+  bind_rows(mister_df, professor_df, gwynnda_df)
+```
+
+The resulting dataset trash_wheel_df has 747 observations and 16 variables such as name (the name of the trash wheel), month, year, dumpster (the dumpster number), weight_tons (amount of total litter), variables indicating litter type, etc.
+
+The total weight of trash collected by Professor Trash Wheel was `r sum(pull(professor_df, weight_tons))` tons.
+
+```{r}
+# filter gwynnda data by year and month 
+gwynnda_cig_july2021 = gwynnda_df |> 
+  filter(year == 2021 & month == "July") 
+
+gwynnda_cig_july2021 = sum(pull(gwynnda_cig_july2021, cigarette_butts))
+```
+The total number of cigarette butts collected by Gwynnda in July of 2021 was `r gwynnda_cig_july2021`.
 
 
 
