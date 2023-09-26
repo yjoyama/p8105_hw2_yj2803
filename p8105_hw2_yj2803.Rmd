@@ -6,5 +6,42 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = T)
 ```
+
+# Problem 1
+```{r, echo=F, message=F}
+library(tidyverse)
+```
+
+```{r}
+pols_month =
+  read_csv("./fivethirtyeight_datasets/pols-month.csv") |> # import pols_month.csv file
+  separate(col=mon, into=c("year", "month", "day")) |> # separate mon variable into year, month and day
+  mutate(
+    year = as.integer(year), # change the class of year, month, day to integer
+    month = as.integer(month),
+    day = as.integer(day),
+    month = case_match(
+    month,
+    01 ~ "january",
+    02 ~ "february",
+    03 ~ "march",
+    04 ~ "april",
+    05 ~ "may",
+    06 ~ "june",
+    07 ~ "july",
+    08 ~ "august",
+    09 ~ "september",
+    10 ~ "october",
+    11 ~ "november",
+    12 ~ "december"
+    ), # replace month number with month name
+    president = case_when(
+      prez_gop == 1 ~ "gop",
+      prez_dem == 1 ~ "dem"
+    ) # make a new variable president with values gop and dem
+  ) |> 
+  select(-c("prez_dem", "prez_gop", "day")) # remove prez_dem, prez_gop, and day
+```
+
