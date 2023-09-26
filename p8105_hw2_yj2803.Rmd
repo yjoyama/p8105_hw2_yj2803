@@ -114,5 +114,6 @@ fivethrityeight_df =
 fivethrityeight_df
 ```
 
-
+After the cleaning process, pols_month_df has 9 variables including year, month, president (whether the president was republican or democratic), etc; snp_df has three variables including year, month, and close (the closing values of the S&P stock index at the associated time); unemployment_df has three variables including year, month, and unemployment_rate (percentage of unemployment at the associated time).  
+Merging these three datasets gives the resulting dataset fivethirtyeight_df. This dataset has 11 variables (year, month, president, close, unemployment_rate, etc.) and 822 rows. The year in this dataset ranges from 1947 to 2015.
 
