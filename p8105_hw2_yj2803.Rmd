@@ -17,7 +17,7 @@ library(tidyverse)
 
 Import and clean the data in pols-month.csv
 
-```{r}
+```{r message = F}
 pols_month_df =
   read_csv("./fivethirtyeight_datasets/pols-month.csv") |> # import pols_month.csv file
   separate(col=mon, into=c("year", "month", "day")) |> # separate mon variable into year, month and day
@@ -52,7 +52,7 @@ pols_month_df
 
 Import and clean the data in snp.csv
 
-```{r}
+```{r message = F}
 snp_df =
   read_csv("./fivethirtyeight_datasets/snp.csv") |> # import snp.csv file
   separate(col = date, into = c("month", "day", "year")) |> # separate date variable into year, month and day
@@ -91,7 +91,7 @@ snp_df
 
 Import and clean the data in unemployment.csv
 
-```{r}
+```{r message = F}
 unemployment_df =
   read_csv("./fivethirtyeight_datasets/unemployment.csv") |> # import unemployment.csv file
   janitor::clean_names() |> # clean the variables name
@@ -160,6 +160,11 @@ gwynnda_df = gwynnda_df |>
     name = "gwynnda"
   ) |> 
   relocate("name") # bring the name to the front
+
+# show results
+mister_df
+professor_df
+gwynnda_df
 ```
 
 Now, let's combine the three datasets.
@@ -187,6 +192,51 @@ gwynnda_cig_july2021 = sum(pull(gwynnda_cig_july2021, cigarette_butts))
 ```
 The total number of cigarette butts collected by Gwynnda in July of 2021 was `r gwynnda_cig_july2021`.
 
+# Problem 3
+
+**Study baseline**
+```{r, warning = F, message = F}
+# import the csv files
+mci_baseline_df =
+  read_csv("./data_mci/MCI_baseline.csv", skip = 1) |> # start reading from row 2
+  janitor::clean_names() |> 
+  mutate(
+    sex = case_match(  
+      sex,
+      1 ~ "male",
+      0 ~ "female"
+    ),  # rewrite sex variables
+    apoe4 = case_match(
+      apoe4,
+      1 ~ "carrier",
+      0 ~ "non-carrier"
+    ),  # rewrite apoe4 variables
+    age_at_onset = if_else(age_at_onset == ".", NA, as.numeric(age_at_onset))
+  )  # replace "." with missing values and change the values in age_at_onset to numeric values
+
+mci_free_baseline_df = mci_baseline_df |> 
+  filter(age_at_onset - current_age > 0 | is.na(age_at_onset)) # exclude if MCI + at baseline
+
+mci_new_beseline_df = mci_baseline_df |> 
+  filter(age_at_onset - current_age > 0)
+
+# calculate the proportion of women who are APOE4 carriers
+women_apoe4 = nrow(filter(mci_free_baseline_df, sex == "female" & apoe4 == "carrier")) / nrow(filter(mci_free_baseline_df, sex== "female"))
+```
+
+`r nrow(mci_baseline_df)` participants were recruited in this study as indicated by the initial dataset (mci_baseline_df).  
+`r nrow(mci_baseline_df) - nrow(mci_free_baseline_df)` participants were excluded from the study because they already had the MCI at the study baseline. Among those who are included, `r nrow(mci_new_beseline_df)` participants developed MCI.  
+The average baseline age for the eligible study participants was `r round(mean(pull(mci_free_baseline_df, current_age)), 2)` and the proportion of women who are APOE4 carriers is `r women_apoe4`.
+
+
+**Biomarker data**
+```{r warning = F, message = F}
+# import the csv files
+mci_amyloid_df =
+  read_csv("./data_mci/mci_amyloid.csv", skip = 1) |> # start reading from row 2
+  janitor::clean_names() |>
+  rename(id = study_id) # change the column name
+```
 
 
 
