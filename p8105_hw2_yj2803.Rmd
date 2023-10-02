@@ -177,6 +177,8 @@ mister_df = mister_df |>
 # combine datasets
 trash_wheel_df =
   bind_rows(mister_df, professor_df, gwynnda_df)
+
+trash_wheel_df
 ```
 
 The resulting dataset trash_wheel_df has 747 observations and 16 variables such as name (the name of the trash wheel), month, year, dumpster (the dumpster number), weight_tons (amount of total litter), variables indicating litter type, etc.
@@ -188,7 +190,7 @@ The total weight of trash collected by Professor Trash Wheel was `r sum(pull(pro
 gwynnda_cig_july2021 = gwynnda_df |> 
   filter(year == 2021 & month == "July") 
 
-gwynnda_cig_july2021 = sum(pull(gwynnda_cig_july2021, cigarette_butts))
+gwynnda_cig_july2021 = sum(pull(gwynnda_cig_july2021, cigarette_butts)) # calculate cigarette butts collected by Gwynnda
 ```
 The total number of cigarette butts collected by Gwynnda in July of 2021 was `r gwynnda_cig_july2021`.
 
@@ -224,9 +226,9 @@ mci_new_beseline_df = mci_baseline_df |>
 women_apoe4 = nrow(filter(mci_free_baseline_df, sex == "female" & apoe4 == "carrier")) / nrow(filter(mci_free_baseline_df, sex== "female"))
 ```
 
-`r nrow(mci_baseline_df)` participants were recruited in this study as indicated by the initial dataset (mci_baseline_df).  
-`r nrow(mci_baseline_df) - nrow(mci_free_baseline_df)` participants were excluded from the study because they already had the MCI at the study baseline. Among those who are included, `r nrow(mci_new_beseline_df)` participants developed MCI.  
-The average baseline age for the eligible study participants was `r round(mean(pull(mci_free_baseline_df, current_age)), 2)` and the proportion of women who are APOE4 carriers is `r women_apoe4`.
+According to the baseline dataset, `r nrow(mci_baseline_df)` participants were recruited in this study.  
+`r nrow(mci_baseline_df) - nrow(mci_free_baseline_df)` participants were excluded because they already had the MCI at the study baseline. Among those who are included, `r nrow(mci_new_beseline_df)` participants developed MCI.  
+The average baseline age for the eligible study participants is `r round(mean(pull(mci_free_baseline_df, current_age)), 2)` and the proportion of women who are APOE4 carriers is `r women_apoe4`.
 
 
 **Biomarker data**
@@ -236,7 +238,46 @@ mci_amyloid_df =
   read_csv("./data_mci/mci_amyloid.csv", skip = 1) |> # start reading from row 2
   janitor::clean_names() |>
   rename(id = study_id) # change the column name
+
+# check ids of participants excluded from the baseline dataset
+excluded_id = mci_baseline_df |> 
+  filter(age_at_onset - current_age <= 0) |> 
+  pull(id)
+
+# exclude these ids from the biomarker data
+mci_amyloid_df = mci_amyloid_df |> 
+  filter(!id %in% c(excluded_id))
 ```
+
+After excluding participants who did not meet the inclusion criteria, the biomarker data (mci_amyloid_df) includes the amyloid beta 42/40 ratio data for `r nrow(mci_amyloid_df)` participants. The amyloid beta 42/40 ratio was collected at baseline and at 2, 4, 6, and 8 years following the initial visit (baseline).  
+
+**Compare baseline and biomarker data**
+```{r}
+# show rows only in mci_free_baseline_df
+anti_join(mci_free_baseline_df, mci_amyloid_df, by = "id")
+
+# show rows only in mci_amyloid_df
+anti_join(mci_amyloid_df, mci_free_baseline_df, by = "id")
+```
+
+The above output shows that participants with ID: `r anti_join(mci_free_baseline_df, mci_amyloid_df, by = "id")$id` are only registered in the baseline dataset, and ID: `r anti_join(mci_amyloid_df, mci_free_baseline_df, by = "id")$id` are only in the biomarker dataset.  
+
+Next, I will combine the two datasets that share common IDs.
+```{r message = F}
+# combine two datasets
+mci_df = inner_join(mci_free_baseline_df, mci_amyloid_df)
+
+mci_df
+```
+
+This dataset has `r nrow(mci_df)` rows and `r ncol(mci_df)` columns including `r colnames(mci_df)`.
+
+Finally, I will export mci_df as a csv file.
+```{r}
+write_csv(mci_df, "./data_mci/mci_df_cleaned.csv")
+```
+
+
 
 
 
