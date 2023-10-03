@@ -123,15 +123,15 @@ Merging these three datasets gives the resulting dataset fivethirtyeight_df. Thi
 ```{r}
 # import dataset from each sheet in excel file
 mister_df =
-  readxl::read_excel("Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N549") |> # data of Mr. Trash Wheel
+  readxl::read_excel("202309 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N586") |> # data of Mr. Trash Wheel
   janitor::clean_names()
 
 professor_df =
-  readxl::read_excel("Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M96") |> # data of Professor Trash Wheel
+  readxl::read_excel("202309 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M108") |> # data of Professor Trash Wheel
   janitor::clean_names()
 
 gwynnda_df =
-  readxl::read_excel("Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", range = "A2:K108") |> # data of Gwynnda Trash Wheel
+  readxl::read_excel("202309 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", range = "A2:L158") |> # data of Gwynnda Trash Wheel
   janitor::clean_names()
 ```
 
@@ -181,7 +181,7 @@ trash_wheel_df =
 trash_wheel_df
 ```
 
-The resulting dataset trash_wheel_df has 747 observations and 16 variables such as name (the name of the trash wheel), month, year, dumpster (the dumpster number), weight_tons (amount of total litter), variables indicating litter type, etc.
+The resulting dataset trash_wheel_df has `r nrow(trash_wheel_df)` observations and `r ncol(trash_wheel_df)` variables such as name (the name of the trash wheel), month, year, dumpster (the dumpster number), weight_tons (amount of total litter), variables indicating litter type, etc.
 
 The total weight of trash collected by Professor Trash Wheel was `r sum(pull(professor_df, weight_tons))` tons.
 
