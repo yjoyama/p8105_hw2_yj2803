@@ -131,7 +131,7 @@ professor_df =
   janitor::clean_names()
 
 gwynnda_df =
-  readxl::read_excel("202309 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", range = "A2:L158") |> # data of Gwynnda Trash Wheel
+  readxl::read_excel("202309 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", range = "A2:L157") |> # data of Gwynnda Trash Wheel
   janitor::clean_names()
 ```
 
