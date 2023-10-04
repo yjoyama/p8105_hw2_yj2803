@@ -237,12 +237,7 @@ The average baseline age for the eligible study participants is `r round(mean(pu
 mci_amyloid_df =
   read_csv("./data_mci/mci_amyloid.csv", skip = 1) |> # start reading from row 2
   janitor::clean_names() |>
-  rename(id = study_id) |> # change the column name
-  pivot_longer(
-    baseline:time_8,
-    names_to = "time",
-    values_to = "amyloid_ratio"
-  )
+  rename(id = study_id)  # change the column name
 
 # check ids of participants excluded from the baseline dataset
 excluded_id = mci_baseline_df |> 
@@ -265,12 +260,17 @@ anti_join(mci_free_baseline_df, mci_amyloid_df, by = "id")
 anti_join(mci_amyloid_df, mci_free_baseline_df, by = "id")
 ```
 
-The above output shows that participants with ID: `r anti_join(mci_free_baseline_df, mci_amyloid_df, by = "id")$id` are only registered in the baseline dataset, and ID: `r anti_join(mci_amyloid_df, mci_free_baseline_df, by = "id")$id` are only in the biomarker dataset.  
+The above output shows that participants with ID: `r anti_join(mci_free_baseline_df, mci_amyloid_df, by = "id") |> pull(id)` are only registered in the baseline dataset, and ID: `r anti_join(mci_amyloid_df, mci_free_baseline_df, by = "id") |> pull(id)` are only in the biomarker dataset.  
 
 Next, I will combine the two datasets that share common IDs.
 ```{r message = F}
 # combine two datasets
-mci_df = inner_join(mci_free_baseline_df, mci_amyloid_df) 
+mci_df = inner_join(mci_free_baseline_df, mci_amyloid_df) |> 
+    pivot_longer(  # change the dataset from wide to long
+    baseline:time_8,
+    names_to = "time",
+    values_to = "amyloid_ratio"
+  )
 
 mci_df
 ```
