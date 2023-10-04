@@ -237,7 +237,12 @@ The average baseline age for the eligible study participants is `r round(mean(pu
 mci_amyloid_df =
   read_csv("./data_mci/mci_amyloid.csv", skip = 1) |> # start reading from row 2
   janitor::clean_names() |>
-  rename(id = study_id) # change the column name
+  rename(id = study_id) |> # change the column name
+  pivot_longer(
+    baseline:time_8,
+    names_to = "time",
+    values_to = "amyloid_ratio"
+  )
 
 # check ids of participants excluded from the baseline dataset
 excluded_id = mci_baseline_df |> 
@@ -265,7 +270,7 @@ The above output shows that participants with ID: `r anti_join(mci_free_baseline
 Next, I will combine the two datasets that share common IDs.
 ```{r message = F}
 # combine two datasets
-mci_df = inner_join(mci_free_baseline_df, mci_amyloid_df)
+mci_df = inner_join(mci_free_baseline_df, mci_amyloid_df) 
 
 mci_df
 ```
